@@ -1,0 +1,21 @@
+# Python & Virtual Environments
+__pycache__/
+venv/
+env/
+*.pyc
+
+# Docker & OS
+.docker/
+.DS_Store
+Thumbs.db
+
+# Secrets & Environment Variables (CRITICAL)
+.env
+.aws/
+credentials.csv
+
+# Datasets & Logs (Do not push heavy data)
+*.csv
+*.log
+data/
+datasets/
