@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # Target Vulnerable Application
+  juice-shop:
+    image: bkimminich/juice-shop
+    container_name: evasionlab-target
+    ports:
+      - "3000:3000"
+    networks:
+      - lab_net
+
+  # Deterministic Engine
+  snort:
+    image: linton/docker-snort
+    container_name: evasionlab-snort
+    network_mode: "service:juice-shop" # Sidecar mode to monitor juice-shop traffic
+    volumes:
+      - ./snort/local.rules:/etc/snort/rules/local.rules
+      - ./logs/snort:/var/log/snort
+    command: snort -q -l /var/log/snort -i eth0 -A fast -c /etc/snort/snort.conf
+
+  # Heuristic Engine Microservice
+  ai-api:
+    build: .
+    container_name: evasionlab-ai
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./logs/snort:/var/log/snort:ro # Read-only access to Snort logs for consensus
+    networks:
+      - lab_net
+
+networks:
+  lab_net:
+    driver: bridge
